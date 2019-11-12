@@ -42,7 +42,7 @@ from tensorflow.python.ops import init_ops
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops import variables
 from tensorflow.python.platform import tf_logging as logging
-from tensorflow.python.training import checkpoint_management
+from tensorflow.python.training import checkpoint_management, savercuhk
 from tensorflow.python.training import saver as v1_saver_lib
 from tensorflow.python.training.saving import functional_saver
 from tensorflow.python.training.saving import saveable_object_util
@@ -1117,6 +1117,9 @@ class TrackableSaver(object):
       return save_path
 
   def restore(self, save_path):
+      return savercuhk.hack_tracable_checkpoint_restore(save_path, self._restore)
+
+  def _restore(self, save_path):
     """Restore a training checkpoint.
 
     Restores `root_trackable` and any objects that it tracks

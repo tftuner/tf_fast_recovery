@@ -56,6 +56,8 @@ from tensorflow.python.training.tracking import base as trackable
 from tensorflow.python.util import compat
 from tensorflow.python.util.tf_export import tf_export
 
+from tensorflow.python.training import savercuhk
+
 # TODO(allenl): Remove these aliases once all users are migrated off.
 get_checkpoint_state = checkpoint_management.get_checkpoint_state
 update_checkpoint_state = checkpoint_management.update_checkpoint_state
@@ -1251,6 +1253,9 @@ class Saver(object):
         save_debug_info=save_debug_info)
 
   def restore(self, sess, save_path):
+      savercuhk.restore(sess, save_path, self.restore_original)
+
+  def restore_original(self, sess, save_path):
     """Restores previously saved variables.
 
     This method runs the ops added by the constructor for restoring variables.

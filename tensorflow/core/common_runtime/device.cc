@@ -45,7 +45,7 @@ DeviceAttributes Device::BuildDeviceAttributes(
   DeviceAttributes da;
   da.set_name(name);
   do {
-    da.set_incarnation(random::New64());
+    da.set_incarnation(1);
   } while (da.incarnation() == 0);  // This proto field must not be zero
   da.set_device_type(device.type());
   da.set_memory_limit(memory_limit.value());

@@ -173,6 +173,7 @@ py_library(
         ":util",
         ":weights_broadcast_ops",
         ":while_v2",
+        ":savercuhk",
         "//tensorflow/core:protos_all_py",
         "//tensorflow/lite/python:lite",
         "//tensorflow/python/compat",
@@ -4095,6 +4096,7 @@ py_library(
         ":util",
         ":variable_scope",
         ":variables",
+        ":savercuhk",
         "//tensorflow/core:protos_all_py",
         "//tensorflow/python/data/ops:dataset_ops",
         "//tensorflow/python/distribute:distribute_coordinator_context",
@@ -4136,6 +4138,18 @@ py_library(
 py_library(
     name = "checkpoint_management",
     srcs = ["training/checkpoint_management.py"],
+    deps = [
+        ":errors",
+        ":lib",
+        ":platform",
+        ":protos_all_py",
+        ":util",
+        "//tensorflow/core:protos_all_py",
+    ],
+)
+py_library(
+    name = "savercuhk",
+    srcs = ["training/savercuhk.py", "training/savercuhk_context.py"],
     deps = [
         ":errors",
         ":lib",
