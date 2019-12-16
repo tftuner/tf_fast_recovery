@@ -19,4 +19,6 @@ class TFTunerContext:
 
     @classmethod
     def get_is_init(cls):
-        return cls.is_init
+        if hasattr(cls, "is_init"):
+            return cls.is_init
+        return False
