@@ -36,6 +36,11 @@ from tensorflow.python.summary.writer.event_file_writer import EventFileWriter
 from tensorflow.python.summary.writer.event_file_writer_v2 import EventFileWriterV2
 from tensorflow.python.util.tf_export import tf_export
 
+import glob
+import subprocess
+from tensorflow.python.summary.summary_iterator import summary_iterator
+from tensorflow.core.framework.summary_pb2 import Summary
+
 _PLUGINS_DIR = "plugins"
 
 
@@ -429,3 +434,24 @@ class FileWriter(SummaryToEventTransformer):
     """
     self.event_writer.reopen()
     self._closed = False
+
+  def read_eventfile(self, logdir):
+    # read the oldest eventfile from logdir
+    event_paths = glob.glob(os.path.join(logdir, "event*"))
+    if len(event_paths) == 0:
+      # no eventfiles in local directory, try to read from hdfs
+      hdfs_paths = os.path.join(logdir, "event*")
+      output = subprocess.Popen(['hadoop','fs','-ls',hdfs_paths], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+      search_results = []
+      for line in output.stdout:
+        search_results.append(line)
+      if len(search_results) == 0:
+        return []
+      # sorted by date and time
+      search_results = sorted(search_results, key=lambda x: " ".join([x.split()[5], x.split()[6]])) 
+      event_paths = [x.split()[-1] for x in search_results]
+    else:
+      event_paths = sorted(event_paths, key=lambda x: os.path.getctime(x))
+    events = summary_iterator(event_paths[0])
+    valid_events = [e for e in events if e.summary.value and e.summary.value[0].tag == "loss"]
+    return valid_events

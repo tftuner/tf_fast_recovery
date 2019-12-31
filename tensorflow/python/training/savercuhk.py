@@ -68,7 +68,8 @@ def get_my_device_name(graph):
 def restore(sess, save_path, callback_org_restore):
 
     if not TFTunerContext.get_is_init():
-        raise Exception("Context is not init")
+        print("Context is not init")
+        return callback_org_restore(sess, save_path)
     # Assume 0 wont die. if yes, recover from checkpoint
     if TFTunerContext.get_task_index() == 0:
         return callback_org_restore(sess, save_path)
@@ -98,7 +99,14 @@ def _restore(sess):
         sess.run(restore_p2_copy_op)
 
 
+class DummyCheckpoint:
+    def __init__(self):
+        new_restore_ops_callback = []
+
 class CustomLoadStatus:
+
+    def __init__(self):
+        self._checkpoint = DummyCheckpoint()
     def assert_consumed(self):
         pass
 
@@ -117,7 +125,8 @@ class CustomLoadStatus:
 
 def hack_tracable_checkpoint_restore(save_path, callback_org_restore):
     if not TFTunerContext.get_is_init():
-        raise Exception("Context is not init")
+        print("Context is not init")
+        return callback_org_restore(save_path)
     # Assume 0 wont die. if yes, recover from checkpoint
     if TFTunerContext.get_task_index() == 0:
         return callback_org_restore(save_path)

@@ -842,6 +842,12 @@ class SummarySaverHook(session_run_hook.SessionRunHook):
       self._summary_writer.add_session_log(
           SessionLog(status=SessionLog.START), global_step)
 
+      valid_events = self._summary_writer.read_eventfile(self._output_dir)
+      if len(valid_events) > 0:
+        for event in valid_events[global_step - 1:]:
+          self._summary_writer.add_event(event)
+        self._summary_writer.flush()
+        
     if self._request_summary:
       self._timer.update_last_triggered_step(global_step)
       if "summary" in run_values.results:
